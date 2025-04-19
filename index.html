@@ -319,54 +319,64 @@
     </footer>
 
     <script>
-      const form = document.querySelector("form");
-      const emailInput = document.querySelector("input[type='email']");
-      const message = document.getElementById("message");
-    
-      form.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const email = emailInput.value.trim();
-        message.textContent = "";
-        message.style.color = "";
-    
-        if (!email || !validateEmail(email)) {
-          message.textContent = "Please enter a valid email address.";
-          message.style.color = "red";
-          return;
-        }
-    
-        try {
-          const response = await fetch("https://script.google.com/macros/s/AKfycbzdRKGY5XYdY_I_3yiRY0xaPo4_4uazPdl-ZsknkxiGLKTKd0tAPCdxjp3A9SaOzmBP/exec", {
-            method: "POST",
-            mode: "cors",
-            headers: {
-              "Content-Type": "application/x-www-form-urlencoded"
-            },
-            body: new URLSearchParams({ email })
-          });
-    
-          const result = await response.json();
-          if (result.success) {
-            message.textContent = "Thank you! You'll be notified.";
-            message.style.color = "green";
-            form.reset();
-          } else {
-            message.textContent = "Something went wrong. Try again later.";
+        const form = document.getElementById("newsletter-form");
+        const nameInput = form.querySelector("input[name='name']");
+        const emailInput = form.querySelector("input[name='email']");
+        const message = document.getElementById("message") || document.createElement("div");
+        const spinner = document.getElementById("spinner");
+        
+        form.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const name = nameInput.value.trim();
+          const email = emailInput.value.trim();
+          message.textContent = "";
+          message.style.color = "";
+        
+          if (!name || !validateEmail(email)) {
+            message.textContent = "Please enter a valid name and email.";
             message.style.color = "red";
+            return;
           }
-        } catch (error) {
-          console.error("Submission error:", error);
-          message.textContent = "Error sending your request.";
-          message.style.color = "red";
+        
+          spinner.style.display = "inline-block";
+        
+          try {
+            const response = await fetch(form.action, {
+              method: "POST",
+              mode: "cors",
+              headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+              },
+              body: new URLSearchParams({ name, email }),
+            });
+        
+            const result = await response.json();
+        
+            if (result.success) {
+              message.textContent = "Thank you! You'll be notified.";
+              message.style.color = "green";
+              form.reset();
+            } else {
+              message.textContent = "Something went wrong. Please try again.";
+              message.style.color = "red";
+            }
+          } catch (error) {
+            console.error("Submission error:", error);
+            message.textContent = "Error sending your request.";
+            message.style.color = "red";
+          } finally {
+            spinner.style.display = "none";
+          }
+        
+          form.appendChild(message); // In case it's not already in DOM
+        });
+        
+        function validateEmail(email) {
+          const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          return re.test(email.toLowerCase());
         }
-      });
-    
-      function validateEmail(email) {
-        // Simple email regex validation
-        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return re.test(String(email).toLowerCase());
-      }
-</script>
+
+    </script>
 
 </body>
 </html>
