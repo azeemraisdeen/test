@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Form Test</title>
+    <style>
+        #alert {
+            display: none;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .spinner {
+             display: none;
+             width: 20px;
+             height: 20px;
+             border: 3px solid rgba(0, 0, 0, 0.1);
+             border-top: 3px solid #3498db;
+             border-radius: 50%;
+             animation: spin 1s linear infinite;
+             margin-left: 10px;
+             vertical-align: middle;
+         }
+
+         @keyframes spin {
+             0% { transform: rotate(0deg); }
+             100% { transform: rotate(360deg); }
+         }
+    </style>
+</head>
+<body>
+    <form id="test-form">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="Name" required><br><br>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="Email" required><br><br>
+        <button type="submit" id="test-submit">
+            Submit <span class="spinner" id="test-spinner"></span>
+        </button>
+    </form>
+    <div id="alert"></div>
+
+    <script>
+        const form = document.getElementById('test-form');
+        const alertBox = document.getElementById('alert');
+        const submitBtn = document.getElementById('test-submit');
+        const spinner = document.getElementById('test-spinner');
+        const scriptURL = "https://script.google.com/macros/s/AKfycbzdRKGY5XYdY_I_3yiRY0xaPo4_4uazPdl-ZsknkxiGLKTKd0tAPCdxjp3A9SaOzmBP/exec"; // **Replace this!**
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            let name = document.getElementById('name').value;
+            let email = document.getElementById('email').value;
+            let dataString = `Name=<span class="math-inline">\{encodeURIComponent\(name\)\}&Email\=</span>{encodeURIComponent(email)}`;
+
+            spinner.style.display = 'inline-block';
+            submitBtn.disabled = true;
+
+            fetch(scriptURL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: dataString,
+            })
+            .then((response) => response.json())
+            .then((data) => {
+                form.reset();
+                if (data.result === 'success') {
+                    showAlert(data.message, 'success');
+                } else {
+                    showAlert(data.message, 'error');
+                }
+            })
+            .catch((error) => {
+                showAlert('Something went wrong. Please try again.', 'error');
+                console.error('Error:', error);
+            })
+            .finally(() => {
+                spinner.style.display = 'none';
+                submitBtn.disabled = false;
+            });
+        });
+
+        function showAlert(message, type) {
+            alertBox.className = `alert ${type}`;
+            alertBox.textContent = message;
+            alertBox.style.display = 'block';
+            setTimeout(() => {
+                alertBox.style.display = 'none';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
