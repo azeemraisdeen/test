@@ -1745,69 +1745,42 @@
     </footer>
 
     <script>
-        const form = document.getElementById('newsletter-form');
-        const alertBox = document.getElementById('alert');
-        // IMPORTANT: Replace this URL with the Web app URL you get after deploying the new Google Apps Script
-        const scriptURL = "https://script.google.com/macros/s/AKfycbzdRKGY5XYdY_I_3yiRY0xaPo4_4uazPdl-ZsknkxiGLKTKd0tAPCdxjp3A9SaOzmBP/exec";
-        const submitBtn = document.getElementById('submit-btn');
-        const spinner = document.getElementById('spinner');
-        const btnText = submitBtn.querySelector('.btn-text');
+        const form = document.querySelector("form");
+  const emailInput = document.querySelector("input[type='email']");
+  const message = document.getElementById("message");
 
-        form.addEventListener('submit', e => {
-            e.preventDefault();
-            const formData = new FormData(form);
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = emailInput.value.trim();
+    message.textContent = "";
 
-            // Show loading
-            spinner.style.display = 'inline-block';
-            submitBtn.disabled = true;
-            btnText.textContent = 'Submitting...';
+    if (!email) {
+      message.textContent = "Please enter a valid email address.";
+      return;
+    }
 
-            fetch(scriptURL, {
-              method: 'POST',
-              body: formData
-            })
-            .then(response => response.json()) // Expecting a JSON response
-            .then(data => {
-              if (data.result === "success") {
-                showAlert(data.message, 'success');
-              } else {
-                showAlert(data.message, 'error');
-              }
-            })
-            .catch(error => {
-              showAlert("Something went wrong. Please try again.", 'error');
-              console.error('Error!', error.message);
-            })
-            .finally(() => {
-              spinner.style.display = 'none';
-              submitBtn.disabled = false;
-              btnText.textContent = 'Notify Me';
-            });
+    try {
+      const response = await fetch("https://script.google.com/macros/s/AKfycbYOUR_DEPLOYED_ID/exec", {
+        method: "POST",
+        mode: "cors",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: new URLSearchParams({ email })
+      });
 
-
-        });
-
-        function showAlert(message, type) {
-            alertBox.className = `alert ${type}`;
-            alertBox.textContent = message;
-            alertBox.style.display = 'block';
-            setTimeout(() => {
-                alertBox.style.display = 'none';
-            }, 4000);
-        }
-
-        function doPost(e) {
-          Logger.log("Received parameters: " + JSON.stringify(e.parameter)); // Log the parameters
-          var ss = SpreadsheetApp.getActiveSpreadsheet();
-          var sheet = ss.getSheetByName("Naila Signups");
-          Logger.log("Sheet object: " + sheet); // Log the sheet object
-          var timestamp = new Date();
-          var name = e.parameter.name;
-          var email = e.parameter.email;
-          Logger.log("Name: " + name + ", Email: " + email + ", Timestamp: " + timestamp); // Log the data before appending
-          sheet.appendRow([name, email, timestamp]);
-          return HtmlService.createHtmlOutput('<!DOCTYPE html><html><head><title>Data Received</title></head><body><p>Thank you for signing up!</p></body></html>');
-        }
+      const result = await response.json();
+      if (result.success) {
+        message.textContent = "Thank you! You'll be notified.";
+        form.reset();
+      } else {
+        message.textContent = "Something went wrong. Try again later.";
+      }
+    } catch (error) {
+      console.error(error);
+      message.textContent = "Error sending your request.";
+    }
+  });
     </script>
 </body>
 </html>
