@@ -1,102 +1,52 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Simple Form Test</title>
-    <style>
-        #alert {
-            display: none;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #ccc;
-        }
-        .success {
-            background-color: #d4edda;
-            color: #155724;
-        }
-        .error {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-        .spinner {
-             display: none;
-             width: 20px;
-             height: 20px;
-             border: 3px solid rgba(0, 0, 0, 0.1);
-             border-top: 3px solid #3498db;
-             border-radius: 50%;
-             animation: spin 1s linear infinite;
-             margin-left: 10px;
-             vertical-align: middle;
-         }
-
-         @keyframes spin {
-             0% { transform: rotate(0deg); }
-             100% { transform: rotate(360deg); }
-         }
-    </style>
+    <title>Simple Form</title>
 </head>
 <body>
-    <form id="test-form">
-        <label for="name">Name:</label>
-        <input type="text" id="name" name="Name" required><br><br>
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="Email" required><br><br>
-        <button type="submit" id="test-submit">
-            Submit <span class="spinner" id="test-spinner"></span>
-        </button>
+    <h1>Enter Your Information</h1>
+    <form id="myForm">
+        <div>
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+        <br>
+        <div>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        <br>
+        <button type="submit">Submit</button>
     </form>
-    <div id="alert"></div>
 
     <script>
-        const form = document.getElementById('test-form');
-        const alertBox = document.getElementById('alert');
-        const submitBtn = document.getElementById('test-submit');
-        const spinner = document.getElementById('test-spinner');
-        const scriptURL = "https://script.google.com/macros/s/AKfycbzdRKGY5XYdY_I_3yiRY0xaPo4_4uazPdl-ZsknkxiGLKTKd0tAPCdxjp3A9SaOzmBP/exec"; // **Replace this!**
+        document.getElementById('myForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the default form submission
 
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            let name = document.getElementById('name').value;
-            let email = document.getElementById('email').value;
-            let dataString = `Name=<span class="math-inline">\{encodeURIComponent\(name\)\}&Email\=</span>{encodeURIComponent(email)}`;
+            const formData = new FormData(this);
+            const data = {};
+            formData.forEach((value, key) => {
+                data[key] = value;
+            });
 
-            spinner.style.display = 'inline-block';
-            submitBtn.disabled = true;
-
-            fetch(scriptURL, {
+            // Send data to Google Apps Script
+            fetch('https://script.google.com/macros/s/AKfycbztVJwo7oEJh1s24t4KAWJCQqFTq_hrOlnF7Jkd2UXbQhA_i3UTD6ShSCiObvaUmhl9/exec', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Content-Type': 'application/json'
                 },
-                body: dataString,
+                body: JSON.stringify(data)
             })
-            .then((response) => response.json())
-            .then((data) => {
-                form.reset();
-                if (data.result === 'success') {
-                    showAlert(data.message, 'success');
-                } else {
-                    showAlert(data.message, 'error');
-                }
+            .then(response => response.text())
+            .then(message => {
+                alert(message); // Show a confirmation message
+                document.getElementById('myForm').reset(); // Clear the form
             })
-            .catch((error) => {
-                showAlert('Something went wrong. Please try again.', 'error');
-                console.error('Error:', error);
-            })
-            .finally(() => {
-                spinner.style.display = 'none';
-                submitBtn.disabled = false;
+            .catch(error => {
+                console.error('Error sending data:', error);
+                alert('An error occurred while submitting the form.');
             });
         });
-
-        function showAlert(message, type) {
-            alertBox.className = `alert ${type}`;
-            alertBox.textContent = message;
-            alertBox.style.display = 'block';
-            setTimeout(() => {
-                alertBox.style.display = 'none';
-            }, 5000);
-        }
     </script>
 </body>
 </html>
