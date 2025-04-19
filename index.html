@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Form</title>
+</head>
+<body>
+    <h1>Enter Your Information</h1>
+    <form id="myForm">
+        <div>
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+        <br>
+        <div>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        <br>
+        <button type="submit">Submit</button>
+    </form>
+
+    <script>
+        document.getElementById('myForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            const formData = new FormData(this);
+            const data = {};
+            formData.forEach((value, key) => {
+                data[key] = value;
+            });
+
+            // Send data to Google Apps Script
+            fetch('https://script.google.com/macros/s/AKfycbztVJwo7oEJh1s24t4KAWJCQqFTq_hrOlnF7Jkd2UXbQhA_i3UTD6ShSCiObvaUmhl9/exec', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.text())
+            .then(message => {
+                alert(message); // Show a confirmation message
+                document.getElementById('myForm').reset(); // Clear the form
+            })
+            .catch(error => {
+                console.error('Error sending data:', error);
+                alert('An error occurred while submitting the form.');
+            });
+        });
+    </script>
+</body>
+</html>
