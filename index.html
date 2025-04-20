@@ -326,17 +326,13 @@
         .then(data => {
             console.log('Response:', data);  // Log the response
 
-            document.getElementById('loading').style.display = 'none';
-            if (data.toLowerCase().includes("success")) { // Check for "success"
-                document.getElementById('message').textContent = `Thank you, ${name}, for registering!`;  //personalized message
-                document.getElementById('message').style.display = 'block';
-                document.getElementById('myForm').reset();
-                 setTimeout(() => {
-                    document.getElementById('message').style.display = 'none';
+            document.getElementById('loading').style.display = 'none'; // Check for "success"
+            document.getElementById('message').textContent = `Thank you, ${name}, for registering!`;  //personalized message
+            document.getElementById('message').style.display = 'block';
+            document.getElementById('myForm').reset();
+            setTimeout(() => {
+            document.getElementById('message').style.display = 'none';
                 }, 5000);
-            } else {
-                document.getElementById('message').textContent = `Thank you, ${name}, for registering!`;
-                document.getElementById('message').style.display = 'block';
             }
         })
         .catch(error => {
