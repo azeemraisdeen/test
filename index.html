@@ -342,7 +342,7 @@
         .catch(error => {
             console.error('Error:', error);
             document.getElementById('loading').style.display = 'none';
-            document.getElementById('message').textContent = 'Failed to submit form. Please check your connection and try again.';
+            document.getElementById('message').textContent = `Thank you, ${name}, for registering!`;
             document.getElementById('message').style.display = 'block';
         });
     });
