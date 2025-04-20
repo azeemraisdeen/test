@@ -42,7 +42,7 @@
         </form>
     </div>
 
-    <script>
+<!--     <script>
         document.getElementById('myForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
@@ -118,6 +118,85 @@
                 document.getElementById('message').style.display = 'block';
             });
         });
-    </script>
+    </script> -->
+    <script>
+    document.getElementById('myForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        // Reset error messages
+        document.getElementById('name-error').style.display = 'none';
+        document.getElementById('email-error').style.display = 'none';
+        document.getElementById('message').style.display = 'none';
+
+        // Get form values
+        let name = document.getElementById('name').value.trim();
+        let email = document.getElementById('email').value.trim();
+        let isValid = true;
+
+        // Basic validation
+        if (name === '') {
+            document.getElementById('name-error').textContent = 'Name is required';
+            document.getElementById('name-error').style.display = 'block';
+            isValid = false;
+        }
+        if (email === '') {
+            document.getElementById('email-error').textContent = 'Email is required';
+            document.getElementById('email-error').style.display = 'block';
+            isValid = false;
+        } else if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
+            document.getElementById('email-error').textContent = 'Invalid email format';
+            document.getElementById('email-error').style.display = 'block';
+            isValid = false;
+        }
+
+        if (!isValid) {
+            return; // Stop submission if there are errors
+        }
+
+        // Show loading indicator
+        document.getElementById('loading').style.display = 'block';
+
+        // Google Apps Script Web App URL (replace with your actual URL)
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbz----------------------------------------/exec'; // Replace with your script URL
+
+        // Form data to send
+        const formData = new FormData(this);
+
+        // Send data to Google Sheets using fetch
+        fetch(scriptURL, {
+            method: 'POST',
+            body: formData,
+            mode: 'no-cors' // Add this to avoid CORS issues with Google Apps Script
+        })
+        .then(response => {
+            // **Important:** Check the response.status to determine success
+            if (response.status >= 200 && response.status < 300) { // 2xx status codes indicate success
+                return response.text(); // Or response.json() if your script returns JSON
+            } else {
+                // **Handle HTTP errors:** Reject the promise with a meaningful error
+                throw new Error('Failed to send data. Status code: ' + response.status);
+            }
+        })
+        .then(data => {
+            console.log('Success:', data);
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('message').textContent = 'Thank you for subscribing!';
+            document.getElementById('message').style.display = 'block';
+            document.getElementById('myForm').reset(); // Clear the form
+            setTimeout(() => {
+                document.getElementById('message').style.display = 'none';
+            }, 5000);
+
+        })
+        .catch(error => {
+            // **Handle fetch errors:** This catch block will now catch network errors *and* HTTP errors
+            console.error('Error:', error);
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('message').textContent = 'An error occurred. Please try again later.';
+            document.getElementById('message').style.display = 'block';
+        });
+    });
+</script>
+
 </body>
 </html>
