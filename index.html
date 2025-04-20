@@ -311,7 +311,7 @@
         document.getElementById('loading').style.display = 'block';
 
         // Google Apps Script Web App URL
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbxo9Ifp82UA6fTgjlaDcZ68l8aCH3lzHKXFpeJFp7TBzpEWkb9YoANCe-YzYJ736i5DIA/exec';
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbxPWq4_OPncCGSfScAM97uX59Hkv7zF5Ko9gfloHvW0AknIaaFSpZMoGyqG9P25FPm0mw/exec';
 
         // Form data to send
         const formData = new FormData(this);
@@ -342,7 +342,7 @@
         .catch(error => {
             console.error('Error:', error);
             document.getElementById('loading').style.display = 'none';
-            document.getElementById('message').textContent = `Thank you, ${name}, for registering!`;
+            document.getElementById('message').textContent = 'Failed to register. Please try again.';
             document.getElementById('message').style.display = 'block';
         });
     });
