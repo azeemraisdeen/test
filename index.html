@@ -198,7 +198,7 @@
     });
 </script> -->
 
-    <script>
+<!--     <script>
     document.getElementById('myForm').addEventListener('submit', function(e) {
         e.preventDefault();
 
@@ -271,7 +271,83 @@
             document.getElementById('message').style.display = 'block';
         });
     });
+</script> -->
+
+    <script>
+    document.getElementById('myForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        // Reset error messages
+        document.getElementById('name-error').style.display = 'none';
+        document.getElementById('email-error').style.display = 'none';
+        document.getElementById('message').style.display = 'none';
+
+        // Get form values
+        let name = document.getElementById('name').value.trim();
+        let email = document.getElementById('email').value.trim();
+        let isValid = true;
+
+        // Basic validation
+        if (name === '') {
+            document.getElementById('name-error').textContent = 'Name is required';
+            document.getElementById('name-error').style.display = 'block';
+            isValid = false;
+        }
+        if (email === '') {
+            document.getElementById('email-error').textContent = 'Email is required';
+            document.getElementById('email-error').style.display = 'block';
+            isValid = false;
+        } else if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
+            document.getElementById('email-error').textContent = 'Invalid email format';
+            document.getElementById('email-error').style.display = 'block';
+            isValid = false;
+        }
+
+        if (!isValid) {
+            return; // Stop submission if there are errors
+        }
+
+        // Show loading indicator
+        document.getElementById('loading').style.display = 'block';
+
+        // Google Apps Script Web App URL
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbxo9Ifp82UA6fTgjlaDcZ68l8aCH3lzHKXFpeJFp7TBzpEWkb9YoANCe-YzYJ736i5DIA/exec';
+
+        // Form data to send
+        const formData = new FormData(this);
+
+        // Send data to Google Sheets using fetch
+        fetch(scriptURL, {
+            method: 'POST',
+            body: formData,
+            mode: 'no-cors'
+        })
+        .then(response => response.text()) // Get response as text
+        .then(data => {
+            console.log('Response:', data);  // Log the response
+
+            document.getElementById('loading').style.display = 'none';
+            if (data.toLowerCase().includes("success")) { // Check for "success"
+                document.getElementById('message').textContent = `Thank you, ${name}, for registering!`;  //personalized message
+                document.getElementById('message').style.display = 'block';
+                document.getElementById('myForm').reset();
+                 setTimeout(() => {
+                    document.getElementById('message').style.display = 'none';
+                }, 5000);
+            } else {
+                document.getElementById('message').textContent = 'Failed to register. Please try again.';
+                document.getElementById('message').style.display = 'block';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('message').textContent = 'Failed to submit form. Please check your connection and try again.';
+            document.getElementById('message').style.display = 'block';
+        });
+    });
 </script>
+
 
 </body>
 </html>
