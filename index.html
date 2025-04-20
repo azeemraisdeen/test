@@ -325,15 +325,13 @@
         .then(response => response.text()) // Get response as text
         .then(data => {
             console.log('Response:', data);  // Log the response
-
             document.getElementById('loading').style.display = 'none'; // Check for "success"
             document.getElementById('message').textContent = `Thank you, ${name}, for registering!`;  //personalized message
             document.getElementById('message').style.display = 'block';
             document.getElementById('myForm').reset();
             setTimeout(() => {
-            document.getElementById('message').style.display = 'none';
-                }, 5000);
-            }
+                document.getElementById('message').style.display = 'none';
+            }, 5000);  
         })
         .catch(error => {
             console.error('Error:', error);
